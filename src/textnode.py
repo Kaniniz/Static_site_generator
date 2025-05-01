@@ -10,13 +10,12 @@ class text_types(Enum):
 class TextNode():
     def __init__(self, text, text_type, url=None):
         self.text = text
-        self.text_type = text_types(text_type)
+        self.text_type = text_type
         self.url = url
     
-    def __eg__(self, Text_Node):
-        return self.text == Text_Node.text and self.text_type == Text_Node.text_type and self.url == Text_Node.url
+    def __eq__(self, other):
+        return self.text_type == other.text_type and self.text == other.text and self.url == other.url
+                
 
     def __repr__(self):
-        if isinstance(self.url, str):
-            return "TextNode(" + self.text + ", " + self.text_type.value + ", " + self.url + ")"
-        return "TextNode(" + self.text + ", " + self.text_type.value + ")"
+        return f"TextNode({self.text}, {self.text_type.value}, {self.url})"

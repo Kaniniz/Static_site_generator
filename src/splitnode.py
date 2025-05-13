@@ -48,6 +48,9 @@ def split_nodes_image(old_nodes):
             else: 
                 new_nodes.append(TextNode(sections[0], text_types.text))
             new_nodes.append(TextNode(section[0], text_types.image, section[1]))
+        if next_section != "":
+            new_nodes.append(TextNode(next_section, text_types.text))
+        
     return new_nodes
 
 def split_nodes_link(old_nodes):
@@ -70,4 +73,20 @@ def split_nodes_link(old_nodes):
             else: 
                 new_nodes.append(TextNode(sections[0], text_types.text))
             new_nodes.append(TextNode(section[0], text_types.link, section[1]))
+        if next_section != "":
+            new_nodes.append(TextNode(next_section, text_types.text))
     return new_nodes
+
+def text_to_textnodes(text):
+    return split_nodes_link(
+                split_nodes_image(
+                    split_nodes_delimiter(
+                        split_nodes_delimiter(
+                            split_nodes_delimiter(
+                                [TextNode(text, text_types.text)], "**", text_types.bold
+                            ), "_", text_types.italic
+                        ), "`", text_types.code
+                    )
+                )
+            )
+

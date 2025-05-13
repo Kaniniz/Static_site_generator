@@ -1,5 +1,5 @@
 import unittest
-from splitnode import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
+from splitnode import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link, text_to_textnodes
 from textnode import TextNode, text_types
 
 
@@ -12,6 +12,18 @@ class TestInlineMarkdown(unittest.TestCase):
                 TextNode("This is text with a ", text_types.text),
                 TextNode("bolded", text_types.bold),
                 TextNode(" word", text_types.text),
+            ],
+            new_nodes,
+        )
+
+    def test_delim_bold(self):
+        node = TextNode(
+            "**bolded**", text_types.text
+        )
+        new_nodes = split_nodes_delimiter([node], "**", text_types.bold)
+        self.assertListEqual(
+            [
+                TextNode("bolded", text_types.bold)
             ],
             new_nodes,
         )
@@ -116,9 +128,10 @@ class TestInlineMarkdown(unittest.TestCase):
                 TextNode("image", text_types.image, "https://i.imgur.com/zjjcJKZ.png"),
                 TextNode(" and a ", text_types.text),
                 TextNode("second_image", text_types.image, "https://imgur.com/3elNhQu"),
-                TextNode("A BOLD node", text_types.bold)
+                TextNode("A BOLD node", text_types.bold),
+                TextNode("A node without a image", text_types.text)
             ], 
-            split_nodes_image([node2, node, node3]))
+            split_nodes_image([node2, node, node3, node2]))
 
     def test_split_node_image_single(self):
         node = TextNode("![image](https://imgur.com/3elNhQu)", text_types.text)
@@ -140,6 +153,7 @@ class TestInlineMarkdown(unittest.TestCase):
                 TextNode("Boot.dev", text_types.link, "https://boot.dev"),
                 TextNode(" and ", text_types.text),
                 TextNode("Youtube", text_types.link, "https://youtube.com"),
+                TextNode("!", text_types.text),
                 TextNode("This is a text without links", text_types.text),
                 TextNode("This is a text with a link to ", text_types.text),
                 TextNode("Nexus mods", text_types.link, "https://nexusmods.com")
@@ -155,6 +169,38 @@ class TestInlineMarkdown(unittest.TestCase):
             split_nodes_link([node])
         )
 
-    
+    def test_text_to_textnode(self):
+        self.maxDiff = None
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        self.assertListEqual(
+            [
+            TextNode("This is ", text_types.text),
+            TextNode("text", text_types.bold),
+            TextNode(" with an ", text_types.text),
+            TextNode("italic", text_types.italic),
+            TextNode(" word and a ", text_types.text),
+            TextNode("code block", text_types.code),
+            TextNode(" and an ", text_types.text),
+            TextNode("obi wan image", text_types.image, "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", text_types.text),
+            TextNode("link", text_types.link, "https://boot.dev"),
+            ],
+            text_to_textnodes(text))
+
+    def test_text_to_textnode_paragraph(self):
+        text = """This is a paragraph
+with **multiple** lines
+with a single line break
+between them"""
+        self.assertListEqual(
+            [
+            TextNode("This is a paragraph\nwith ", text_types.text),
+            TextNode("multiple", text_types.bold),
+            TextNode(" lines\nwith a single line break\nbetween them", text_types.text)
+            ],
+            text_to_textnodes(text)
+        )
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -112,3 +112,26 @@ this is paragraph text
             html,
             "<div><blockquote>This is a blockquote block</blockquote><p>this is paragraph text</p></div>",
         )
+
+    def test_extra_empty(self):
+        md = """
+
+
+This is a paragraph
+
+
+
+# This is a header
+
+
+
+**Bold**
+
+
+
+"""
+
+        self.assertEqual(
+            "<div><p>This is a paragraph</p><h1>This is a header</h1><p><b>Bold</b></p></div>",
+            markdown_to_HTML(md).to_html()
+        )

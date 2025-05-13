@@ -12,13 +12,16 @@ def markdown_to_blocks(markdown):
     blocks = []
     md = markdown.split("\n\n")
     for text in md:
+        text = text.rstrip().lstrip()
         if text == "":
             continue
-        text = text.rstrip().lstrip()
+        
         blocks.append(text)
     return blocks
     
 def block_to_block_type(block):
+    if block == "" or block.startswith("\n"):
+        raise Exception("Empty block")
     if block.startswith(("# ", "## ", "### ", "#### ", "##### ", "###### ")):
         return BlockTypes.HEADING
     if block.startswith("```") and block.endswith("```"):

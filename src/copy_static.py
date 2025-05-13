@@ -30,10 +30,10 @@ def generate_page(from_path, template_path, dest_path):
     template = get_file_content(template_path)
     HTML = markdown_to_HTML(markdown).to_html()
     title = extract_title(markdown)
-    full_HTML = template.replace("Title", title).replace("Content", HTML)
-    if  not os.path.lexist(os.path.dirname(dest_path)):
+    full_HTML = template.replace("{{ Title }}", title).replace("{{ Content }}", HTML)
+    if  not os.path.lexists(os.path.dirname(dest_path)):
         os.makedirs(dest_path)
-    with open(dest_path) as file:
+    with open(dest_path, mode="w") as file:
         file.write(full_HTML)
 
 def get_file_content(file_path):

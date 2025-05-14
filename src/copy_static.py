@@ -4,6 +4,7 @@ from markdown_to_HTML import markdown_to_HTML
 from markdown_blocks import markdown_to_blocks, block_to_block_type
 
 
+
 def copy_files_recursive(source_dir_path, dest_dir_path):
     if not os.path.exists(dest_dir_path):
         os.mkdir(dest_dir_path)
@@ -24,14 +25,15 @@ def extract_title(markdown):
             return block.lstrip("# ")
     raise Exception("No valid h1 header")
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generation page from {from_path} to {dest_path} using {template_path}")
 
     markdown = get_file_content(from_path)
     template = get_file_content(template_path)
     HTML = markdown_to_HTML(markdown).to_html()
     title = extract_title(markdown)
-    full_HTML = template.replace("{{ Title }}", title).replace("{{ Content }}", HTML)
+    full_HTML = template.replace("{{ Title }}", title).replace("{{ Content }}", HTML).replace('href="/', f'href="{basepath}').replace('src="/', f'src="{basepath}')
+    
     
     if not os.path.lexists(os.path.dirname(dest_path)):
         directory = dest_path.rsplit("/", maxsplit=1)
@@ -44,9 +46,9 @@ def get_file_content(file_path):
         book = file.read()
         return book
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
     for file in os.listdir(dir_path_content):
         if os.path.isfile(os.path.join(dir_path_content, file)):
-            generate_page(os.path.join(dir_path_content, file), template_path, os.path.join(dest_dir_path, "index.html"))
+            generate_page(os.path.join(dir_path_content, file), template_path, os.path.join(dest_dir_path, "index.html"), basepath)
             continue
-        generate_pages_recursive(os.path.join(dir_path_content, file), template_path, os.path.join(dest_dir_path, file))
+        generate_pages_recursive(os.path.join(dir_path_content, file), template_path, os.path.join(dest_dir_path, file), basepath)

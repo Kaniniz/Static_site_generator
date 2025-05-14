@@ -1,1 +1,1 @@
-python3 src/main.py "/https://github.com/Kaniniz/Static_site_generator/docs/"
+python3 src/main.py "/Static_site_generator/docs/"

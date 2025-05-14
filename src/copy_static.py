@@ -26,17 +26,27 @@ def extract_title(markdown):
 
 def generate_page(from_path, template_path, dest_path):
     print(f"Generation page from {from_path} to {dest_path} using {template_path}")
+
     markdown = get_file_content(from_path)
     template = get_file_content(template_path)
     HTML = markdown_to_HTML(markdown).to_html()
     title = extract_title(markdown)
     full_HTML = template.replace("{{ Title }}", title).replace("{{ Content }}", HTML)
-    if  not os.path.lexists(os.path.dirname(dest_path)):
-        os.makedirs(dest_path)
-    with open(dest_path, mode="w") as file:
-        file.write(full_HTML)
+    
+    if not os.path.lexists(os.path.dirname(dest_path)):
+        directory = dest_path.rsplit("/", maxsplit=1)
+        os.makedirs(directory[0])
+    to_file = open(dest_path, "w")
+    to_file.write(full_HTML)
 
 def get_file_content(file_path):
     with open(file_path) as file:
         book = file.read()
         return book
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for file in os.listdir(dir_path_content):
+        if os.path.isfile(os.path.join(dir_path_content, file)):
+            generate_page(os.path.join(dir_path_content, file), template_path, os.path.join(dest_dir_path, "index.html"))
+            continue
+        generate_pages_recursive(os.path.join(dir_path_content, file), template_path, os.path.join(dest_dir_path, file))
